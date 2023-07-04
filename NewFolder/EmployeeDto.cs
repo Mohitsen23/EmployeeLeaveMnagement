@@ -21,6 +21,7 @@ namespace Practice.NewFolder
         public string? Companyname { get; set; }
 
         public int? Manager { get; set; }
+        public string? Status { get; set; }
 
         public virtual ICollection<LeaveQuotum> LeaveQuota { get; set; } = new List<LeaveQuotum>();
 

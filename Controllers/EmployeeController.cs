@@ -80,9 +80,18 @@ namespace Practice.Controllers
         public async Task<ActionResult<List<Employee>>> getEmployees()
         {
             List<Employee> EmployeesList = await Leaveapp.Employees.ToListAsync();
-            if (EmployeesList != null)
+
+            List<Employee> FiltereEmployee = new List<Employee>();
+            foreach(var emp in EmployeesList)
             {
-                return EmployeesList;
+                if(emp.Status!= "Removed             ")
+                {
+                    FiltereEmployee.Add(emp);
+                }
+            }
+            if (FiltereEmployee != null)
+            {
+                return FiltereEmployee;
             }
             return BadRequest("No Employees");
 

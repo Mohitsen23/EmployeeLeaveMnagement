@@ -123,9 +123,11 @@ namespace Practice.Controllers
             var employee = Leaveapp.Employees.FirstOrDefault(emp => emp.Email == email);
             if (employee != null)
             {
-                Leaveapp.Employees.Remove(employee);
+
+                employee.Status = "Removed";
                 Leaveapp.SaveChanges();
-                return Ok("Employee Deleted Successfully");
+                return Ok("Removed Successfully");
+                
             }
             return BadRequest("Not Deleted");
 
