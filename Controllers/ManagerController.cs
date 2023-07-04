@@ -115,10 +115,25 @@ namespace Practice.Controllers
             }    
               return BadRequest("Not Approved");
         }
+
+
+        [HttpDelete("/deleteEmployee/{email}")]
+        public async Task<ActionResult> deleteEmployee(String email)
+        {
+            var employee = Leaveapp.Employees.FirstOrDefault(emp => emp.Email == email);
+            if (employee != null)
+            {
+                Leaveapp.Employees.Remove(employee);
+                Leaveapp.SaveChanges();
+                return Ok("Employee Deleted Successfully");
+            }
+            return BadRequest("Not Deleted");
+
+    }
     }
 
-
-
+    
+    
 
 }
 
