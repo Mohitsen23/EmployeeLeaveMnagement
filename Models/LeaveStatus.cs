@@ -8,8 +8,9 @@ namespace Practice.Models;
 public partial class LeaveStatus
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+  
     public int Id { get; set; }
+
     public int Emplid { get; set; }
     public string Leavetype { get; set; } = null!;
 

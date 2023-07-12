@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿   using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Practice.Models;
 using Practice.NewFolder;
@@ -21,7 +21,7 @@ namespace Practice.Controllers
         {
 
            
-            var User = Leaveapp.Employees.FirstOrDefault(user => user.Email == mgr.Email);
+            var User = Leaveapp.Employees.Where(user => user.Email == mgr.Email).SingleOrDefault();
             if (User != null)
             {
                 return BadRequest("User With Email Already Exist");
@@ -29,7 +29,7 @@ namespace Practice.Controllers
             }
 
             var employee = new Employee
-            {  Id=mgr.Id,
+            {  
                 Firstname = mgr.Firstname,
                 Lastname = mgr.Lastname,
                 Email = mgr.Email,
@@ -37,8 +37,19 @@ namespace Practice.Controllers
                 Department = mgr.Department,
                 Companyname = mgr.Companyname,
                 Manager = mgr.Manager,
-                LeaveQuota=mgr.LeaveQuota
+                Status=mgr.Status
+               
             };
+           /* var leaveQuota = new LeaveQuotum
+            {
+                Emplid=4,
+                Remainingleave = 20,
+                Totalleave = 20,
+                Usedleave = 0
+
+            };
+            Leaveapp.LeaveQuota.Add(leaveQuota);
+           */
             Leaveapp.Employees.Add(employee);
             Leaveapp.SaveChanges();
 
@@ -54,12 +65,16 @@ namespace Practice.Controllers
             {
                 if (user.Password == emp.Password)
                 {
-                    return Ok("User Login Successful");
+                    return user;
                 }
             }
 
             return BadRequest("User Does Not Exist");
         }
+
+
+
+       
 
 
         [HttpGet("/getUserByID/{id}")]
@@ -79,6 +94,8 @@ namespace Practice.Controllers
         [HttpGet("/getEmployees")]
         public async Task<ActionResult<List<Employee>>> getEmployees()
         {
+            string jwtKey = Startup.GenerateSecretKey(32);
+            Console.Write("JWT " + jwtKey);
             List<Employee> EmployeesList = await Leaveapp.Employees.ToListAsync();
 
             List<Employee> FiltereEmployee = new List<Employee>();
@@ -124,7 +141,23 @@ namespace Practice.Controllers
         }
 
 
-        
+
+        [HttpDelete("/deleteLeave/{id}")]
+        public async Task<ActionResult> deleteLeave(int id)
+        {
+            var employee = Leaveapp.LeaveStatuses.FirstOrDefault(emp => emp.Id == id);
+            if (employee != null)
+            {
+
+                Leaveapp.LeaveStatuses.Remove(employee);
+                Leaveapp.SaveChanges();
+                return Ok("Removed Successfully");
+
+            }
+            return BadRequest("Not Deleted");
+
+        }
+
 
 
 

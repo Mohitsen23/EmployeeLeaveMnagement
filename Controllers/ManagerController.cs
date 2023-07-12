@@ -1,9 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Practice.Models;
 using Practice.NewFolder;
 using System.ComponentModel;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Practice.Controllers
 {
@@ -12,10 +18,11 @@ namespace Practice.Controllers
     public class ManagerController : ControllerBase
     {
         private readonly LeaveApplicationContext Leaveapp;
-        public ManagerController(LeaveApplicationContext leaveapp)
+        private readonly IConfiguration _config;
+        public ManagerController(LeaveApplicationContext leaveapp, IConfiguration config)
         {
             Leaveapp = leaveapp;
-
+            _config = config;
 
         }
         [HttpPost]
@@ -52,14 +59,20 @@ namespace Practice.Controllers
 
 
         [HttpPost("/mgrlogin")]
-        public async Task<ActionResult<Employee>> managerLogin(MgrLoginDTO mgr)
+        public async Task<ActionResult<Manager>> managerLogin(MgrLoginDTO mgr)
         {
-            var User = Leaveapp.Managers.FirstOrDefault(users => users.Email == mgr.Email);
+
+
+            var User = Leaveapp.Managers.SingleOrDefault(user => user.Email == mgr.Email);
+
             if (User != null)
             {
                 if (User.Password == mgr.Password)
                 {
-                    return Ok("USer Login SuccesFull");
+
+
+                    return User;
+
                 }
             }
 
@@ -78,6 +91,8 @@ namespace Practice.Controllers
 
 
         [HttpGet("/leaveRequest")]
+
+       
         public async Task<ActionResult<List<LeaveStatus>>> AllLeaveRequest()
         {
             // Assuming you have a database context named "dbContext" with a DbSet for LeaveTable
@@ -86,14 +101,35 @@ namespace Practice.Controllers
             List<LeaveStatus> FilteredRequest = new List<LeaveStatus>();
             foreach(var data in leaveRequests)
             {
-                if (data.Status != "Approved                      ")
-                {
+               
+            
                     FilteredRequest.Add(data);
-                }
+               
             }
 
             return FilteredRequest;
         }
+
+
+
+        [HttpGet("/RejectLeaveRequest/{leaveid}")]
+        public async Task<IActionResult> RejectLeaveRequest(int leaveid)
+        {
+
+            var LeaveData = await Leaveapp.LeaveStatuses.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
+
+            if (LeaveData != null)
+            {
+                LeaveData.Status = "Rejected";
+               
+                Leaveapp.SaveChanges();
+                return Ok("Leave Rejcted");
+            }
+            return BadRequest("Not Approved");
+        }
+
+
+
 
 
         [HttpGet("/ChangeLeaveStatus/{leaveid}")]
@@ -105,11 +141,7 @@ namespace Practice.Controllers
             if (LeaveData != null)
             {
                 LeaveData.Status = "Approved";
-             var dataleave=await Leaveapp.LeaveTables.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
-               var data=await Leaveapp.LeaveQuota.FirstOrDefaultAsync(leavedata => leavedata.Emplid == dataleave.Employeeid);
-                data.Remainingleave -=  1;
-                data.Totalleave -= 1;
-                data.Usedleave +=1;
+             
                 Leaveapp.SaveChanges();
                 return Ok("Leave Approved");
             }    
@@ -132,10 +164,41 @@ namespace Practice.Controllers
             return BadRequest("Not Deleted");
 
     }
+
+        [HttpPut("/updateEmployee/{id}")]
+        public async Task<ActionResult> UpdateEmployees(int id, [FromBody] EmployeeDto emp)
+        {
+            Employee existingEmployee = await Leaveapp.Employees.FindAsync(id);
+
+            if (existingEmployee != null)
+            {
+                existingEmployee.Firstname = emp.Firstname;
+                existingEmployee.Lastname = emp.Lastname;
+                existingEmployee.Email = emp.Email;
+                existingEmployee.Password = emp.Password;
+                existingEmployee.Department = emp.Department;
+                existingEmployee.Companyname = emp.Companyname;
+
+                existingEmployee.Manager = emp.Manager;
+
+                Leaveapp.Update(existingEmployee);
+                await Leaveapp.SaveChangesAsync();
+
+                return Ok("User details updated");
+            }
+
+            return BadRequest("Employee not found");
+        }
+
+
+
+
+
     }
 
-    
-    
+
+
 
 }
+
 

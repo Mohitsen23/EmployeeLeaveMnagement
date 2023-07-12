@@ -9,12 +9,13 @@ public partial class LeaveTable
 {
 
    
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+ 
     public int Id { get; set; }
     [Key]
+  
     public int Leaveid { get; set; }
 
     public int Employeeid { get; set; }
 
-    public virtual ICollection<LeaveStatus> LeaveStatuses { get; set; } = new List<LeaveStatus>();
+   
 }

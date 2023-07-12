@@ -19,12 +19,14 @@ namespace Practice.Controllers
         [HttpPost("/applyleave")]
         public async Task<ActionResult> ApplyLeave(AppplyLeaveDTO leave)
         {
+
+            Console.WriteLine(leave);
             Guid demoGuid = Guid.NewGuid();
 
            var applyleave = new LeaveStatus()
-            {    Id=leave.Id,
+            {    
                 Leavetype = leave.Leavetype,
-                Leaveid =leave.Leaveid,
+                  Emplid=leave.Emplid,
                 FromDate = leave.FromDate,
                 ToDate = leave.ToDate,
                 Reason = leave.Reason,
@@ -42,7 +44,13 @@ namespace Practice.Controllers
 
 
 
+/*
+    var dataleave = await Leaveapp.LeaveTables.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
+    var data = await Leaveapp.LeaveQuota.FirstOrDefaultAsync(leavedata => leavedata.Emplid == dataleave.Employeeid);
+    data.Remainingleave -= 1;
+    data.Totalleave -= 1;
+    data.Usedleave += 1;
+*/
 
-
-    }
+}
 }

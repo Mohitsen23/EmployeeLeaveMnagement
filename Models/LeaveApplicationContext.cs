@@ -80,35 +80,38 @@ public partial class LeaveApplicationContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_LeaveQuota_Employee");
         });
-
         modelBuilder.Entity<LeaveStatus>(entity =>
         {
             entity.ToTable("LeaveStatus");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.FromDate)
                 .HasColumnType("date")
                 .HasColumnName("from_date");
+
             entity.Property(e => e.Leaveid).HasColumnName("leaveid");
+
             entity.Property(e => e.Leavetype)
                 .HasMaxLength(30)
-                .IsFixedLength()
                 .HasColumnName("leavetype");
+
             entity.Property(e => e.Reason)
                 .HasMaxLength(30)
-                .IsFixedLength()
                 .HasColumnName("reason");
+
             entity.Property(e => e.Status)
                 .HasMaxLength(30)
-                .IsFixedLength()
                 .HasColumnName("status");
+
             entity.Property(e => e.ToDate)
                 .HasColumnType("date")
                 .HasColumnName("to_date");
 
-            entity.HasOne(d => d.Leave).WithMany(p => p.LeaveStatuses)
+            entity.HasOne(d => d.Leave)
+                .WithMany()
                 .HasForeignKey(d => d.Leaveid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_LeaveStatus_LeaveTable");
@@ -116,16 +119,22 @@ public partial class LeaveApplicationContext : DbContext
 
         modelBuilder.Entity<LeaveTable>(entity =>
         {
-            entity.HasKey(e => e.Leaveid);
-
             entity.ToTable("LeaveTable");
 
             entity.Property(e => e.Leaveid)
-                .ValueGeneratedNever()
-                .HasColumnName("leaveid");
-            entity.Property(e => e.Employeeid).HasColumnName("employeeid");
-            entity.Property(e => e.Id).HasColumnName("id");
+                .HasColumnName("leaveid")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Employeeid)
+                .HasColumnName("employeeid");
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
         });
+
+
+
+
 
         modelBuilder.Entity<Manager>(entity =>
         {
