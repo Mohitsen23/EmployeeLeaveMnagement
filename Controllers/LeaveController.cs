@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Practice.NewFolder;
 using Practice.Models;
+using Microsoft.AspNetCore.SignalR;
+
 namespace Practice.Controllers
 
 {
@@ -9,9 +11,11 @@ namespace Practice.Controllers
     public class LeaveController:ControllerBase
     {
         private readonly LeaveApplicationContext Leaveapp;
-        public LeaveController(LeaveApplicationContext leaveapp)
+        
+        public LeaveController(LeaveApplicationContext leaveapp )
         {
             Leaveapp = leaveapp;
+            
 
         }
 
@@ -35,6 +39,7 @@ namespace Practice.Controllers
                 Leave = leave.Leave
 
             };
+      
 
 
             Leaveapp.LeaveStatuses.Add(applyleave);

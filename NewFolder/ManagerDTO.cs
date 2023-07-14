@@ -19,6 +19,6 @@ namespace Practice.NewFolder
 
         public string Companyname { get; set; } = null!;
 
-        public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+     
     }
 }

@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Practice.Controllers
 {
     [Route("api/[controller]")]
@@ -35,6 +36,9 @@ namespace Practice.Controllers
             var User = Leaveapp.Managers.FirstOrDefault(user => user.Email == mgr.Email);
             if (User != null)
             {
+
+
+
                 return BadRequest("User With Email Already Exist");
 
             }
@@ -47,7 +51,7 @@ namespace Practice.Controllers
                 Password = mgr.Password,
                 Department = mgr.Department,
                 Companyname = mgr.Companyname,
-                Employees = mgr.Employees
+              
             };
             Leaveapp.Managers.Add(manager);
             Leaveapp.SaveChanges();
@@ -59,25 +63,61 @@ namespace Practice.Controllers
 
 
         [HttpPost("/mgrlogin")]
-        public async Task<ActionResult<Manager>> managerLogin(MgrLoginDTO mgr)
+        public async Task<ActionResult<Manager>> ManagerLogin(MgrLoginDTO mgr)
         {
+            var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
 
-
-            var User = Leaveapp.Managers.SingleOrDefault(user => user.Email == mgr.Email);
-
-            if (User != null)
+            if (user != null && user.Password == mgr.Password)
             {
-                if (User.Password == mgr.Password)
-                {
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, mgr.Email),
+            new Claim(ClaimTypes.Role, "Manager"),
+            // Add any additional claims as needed
+        };
 
+                var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+                var token = new JwtSecurityToken(
+                    issuer: _config["Jwt:Issuer"],
+                    audience: _config["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddHours(1), // Use local time zone for expiration
+                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+                );
 
-                    return User;
-
-                }
+                var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+                return Ok(jwtToken);
             }
 
-            return BadRequest("User Not Exist");
+            return BadRequest("User does not exist");
         }
+
+
+
+        [Authorize(Roles = "Manager")]
+        [HttpPost("/mgrlogindata")]
+        public async Task<ActionResult<Manager>> ManagerLoginData(MgrLoginDTO mgr)
+        {
+            var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
+
+            if (user != null && user.Password == mgr.Password)
+            {
+               
+                return Ok(user);
+            }
+
+            return BadRequest("User does not exist");
+        }
+
+
+
+
+
+
+
+
+
+
         [HttpGet("/EmployeesbyMgrId/{id}")]
         public async Task<ActionResult<Employee>> EmployeesbyMgrId(int id)
         {
@@ -89,7 +129,7 @@ namespace Practice.Controllers
             return BadRequest("No Employees Under Manager");
         }
 
-
+        [Authorize(Roles = "Manager")]
         [HttpGet("/leaveRequest")]
 
        
@@ -111,7 +151,7 @@ namespace Practice.Controllers
         }
 
 
-
+        [Authorize(Roles = "Manager")]
         [HttpGet("/RejectLeaveRequest/{leaveid}")]
         public async Task<IActionResult> RejectLeaveRequest(int leaveid)
         {
@@ -131,7 +171,7 @@ namespace Practice.Controllers
 
 
 
-
+        [Authorize(Roles = "Manager")]
         [HttpGet("/ChangeLeaveStatus/{leaveid}")]
         public async Task<IActionResult> UpdateLeaveRequest(int leaveid)
         {
@@ -148,7 +188,7 @@ namespace Practice.Controllers
               return BadRequest("Not Approved");
         }
 
-
+        [Authorize(Roles = "Manager")]
         [HttpDelete("/deleteEmployee/{email}")]
         public async Task<ActionResult> deleteEmployee(String email)
         {
@@ -164,7 +204,7 @@ namespace Practice.Controllers
             return BadRequest("Not Deleted");
 
     }
-
+        [Authorize(Roles = "Manager")]
         [HttpPut("/updateEmployee/{id}")]
         public async Task<ActionResult> UpdateEmployees(int id, [FromBody] EmployeeDto emp)
         {

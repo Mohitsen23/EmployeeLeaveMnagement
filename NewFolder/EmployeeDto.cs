@@ -22,7 +22,8 @@ namespace Practice.NewFolder
 
         public int? Manager { get; set; }
         public string? Status { get; set; }
+     
 
-        
+
     }
 }

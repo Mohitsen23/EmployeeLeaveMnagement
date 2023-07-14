@@ -11,6 +11,7 @@ namespace Practice.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
+        private static Random random = new Random();
         private readonly LeaveApplicationContext Leaveapp;
         public EmployeeController(LeaveApplicationContext leaveapp )
         {
@@ -27,9 +28,13 @@ namespace Practice.Controllers
                 return BadRequest("User With Email Already Exist");
 
             }
+            Guid guid = Guid.NewGuid();
+            byte[] bytes = guid.ToByteArray();
+            int uniqueInteger = BitConverter.ToInt32(bytes, 0);
 
             var employee = new Employee
             {  
+
                 Firstname = mgr.Firstname,
                 Lastname = mgr.Lastname,
                 Email = mgr.Email,
@@ -37,19 +42,14 @@ namespace Practice.Controllers
                 Department = mgr.Department,
                 Companyname = mgr.Companyname,
                 Manager = mgr.Manager,
-                Status=mgr.Status
+                Status=mgr.Status,
                
-            };
-           /* var leaveQuota = new LeaveQuotum
-            {
-                Emplid=4,
-                Remainingleave = 20,
-                Totalleave = 20,
-                Usedleave = 0
 
             };
-            Leaveapp.LeaveQuota.Add(leaveQuota);
-           */
+
+            
+         
+          
             Leaveapp.Employees.Add(employee);
             Leaveapp.SaveChanges();
 

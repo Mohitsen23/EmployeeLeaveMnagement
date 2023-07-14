@@ -92,3 +92,6 @@ C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\System.Net.Http.Form
 C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\System.Web.Http.dll
 C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\System.Web.Http.Cors.dll
 C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\System.Net.WebSockets.WebSocketProtocol.dll
+C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\Microsoft.AspNetCore.Authorization.dll
+C:\Users\Hi\source\repos\Practice\Practice\bin\Debug\net6.0\Microsoft.AspNetCore.Metadata.dll

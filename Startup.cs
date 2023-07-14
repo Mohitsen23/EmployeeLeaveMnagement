@@ -15,7 +15,34 @@ namespace Practice
 
     {
 
-        
+        public void ConfiugureServices(IServiceCollection services)
+        {
+           
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("http://localhost:3000")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                });
+            });
+
+
+
+        }
+
+
+
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseCors(); // Move the UseCors middleware above UseEndpoints
+          
+        }
+
 
         public static string GenerateSecretKey(int length)
         {
