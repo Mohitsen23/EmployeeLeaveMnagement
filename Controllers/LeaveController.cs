@@ -2,20 +2,21 @@
 using Practice.NewFolder;
 using Practice.Models;
 using Microsoft.AspNetCore.SignalR;
+using Practice.Nofication;
 
 namespace Practice.Controllers
 
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LeaveController:ControllerBase
+    public class LeaveController : ControllerBase
     {
         private readonly LeaveApplicationContext Leaveapp;
-        
-        public LeaveController(LeaveApplicationContext leaveapp )
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public LeaveController(LeaveApplicationContext leaveapp, IHubContext<NotificationHub> hubContext)
         {
             Leaveapp = leaveapp;
-            
+            _hubContext = hubContext;
 
         }
 
@@ -27,10 +28,10 @@ namespace Practice.Controllers
             Console.WriteLine(leave);
             Guid demoGuid = Guid.NewGuid();
 
-           var applyleave = new LeaveStatus()
-            {    
+            var applyleave = new LeaveStatus()
+            {
                 Leavetype = leave.Leavetype,
-                  Emplid=leave.Emplid,
+                Emplid = leave.Emplid,
                 FromDate = leave.FromDate,
                 ToDate = leave.ToDate,
                 Reason = leave.Reason,
@@ -39,23 +40,16 @@ namespace Practice.Controllers
                 Leave = leave.Leave
 
             };
-      
-
+  
 
             Leaveapp.LeaveStatuses.Add(applyleave);
             Leaveapp.SaveChanges();
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification", "New leave request received");
             return Ok("Leave Apply Successfully");
         }
 
 
 
-/*
-    var dataleave = await Leaveapp.LeaveTables.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
-    var data = await Leaveapp.LeaveQuota.FirstOrDefaultAsync(leavedata => leavedata.Emplid == dataleave.Employeeid);
-    data.Remainingleave -= 1;
-    data.Totalleave -= 1;
-    data.Usedleave += 1;
-*/
-
-}
+       
+    }
 }

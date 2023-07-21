@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Practice.Models;
 using System.Text;
+using Practice.Nofication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,11 +52,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.UseCors(); // Add this line to enable CORS
+
 
 
 

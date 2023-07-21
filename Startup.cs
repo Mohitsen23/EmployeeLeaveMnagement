@@ -1,65 +1,47 @@
-﻿
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Practice.Controllers;
+using Practice.Models;
+using Practice.Nofication;
 using System.Security.Cryptography;
 using System.Text;
-using System;
-using System.Security.Cryptography;
-
 
 namespace Practice
-{
-    public class Startup
-
-
-
-    {
-
-        public void ConfiugureServices(IServiceCollection services)
+{ public class Startup {
+  private readonly IConfiguration _configuration;
+        public Startup(IConfiguration configuration)
         {
-           
-
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(builder =>
-                {
-                    builder.WithOrigins("http://localhost:3000")
-                           .AllowAnyHeader()
-                           .AllowAnyMethod()
-                           .AllowCredentials();
-                });
-            });
-
-
-
-        }
-
-
-
-
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseCors(); // Move the UseCors middleware above UseEndpoints
-          
-        }
-
-
-        public static string GenerateSecretKey(int length)
-        {
-            byte[] randomBytes = new byte[length];
-            using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
-            {
-                rngCryptoServiceProvider.GetBytes(randomBytes);
-            }
-            return Convert.ToBase64String(randomBytes);
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // ...
 
-            // Configure JWT authentication
-            var key = Encoding.ASCII.GetBytes(GenerateSecretKey(32)); // Replace with your secret key
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAnyOriginWithCredentials",
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
+            services.AddSingleton<OTP>();
+            services.AddTransient<EmailSenderController>();
+            services.AddSignalR();
+            services.AddControllers();
+            var key = Encoding.ASCII.GetBytes(GenerateSecretKey(32));
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -78,19 +60,36 @@ namespace Practice
                 };
             });
 
-            // ...
+          
         }
-        // Generate a 256-bit (32-byte) secret key
 
-      
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.UseCors("AllowAnyOriginWithCredentials"); // Apply the CORS policy
+
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                // Map SignalR Hub endpoint and apply CORS policy
+                endpoints.MapHub<NotificationHub>("/notificationHub")
+                         .RequireCors("AllowAnyOriginWithCredentials");
+            });
+
+            // Rest of your configuration
+        }
 
 
-
+        public static string GenerateSecretKey(int length)
+        {
+            byte[] randomBytes = new byte[length];
+            using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
+            {
+                rngCryptoServiceProvider.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes);
+        }
     }
 }
-
-
-
-
-
-
