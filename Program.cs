@@ -5,12 +5,13 @@ using Microsoft.IdentityModel.Tokens;
 using Practice.Models;
 using System.Text;
 using Practice.Nofication;
+using Practice.ChatHub;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<LeaveApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PracticeApp")));
-
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -58,8 +59,9 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.UseCors(); // Add this line to enable CORS
+app.MapHub<NotificationHub>("/notificationHub");
 
-
+app.MapHub<ChatdataHub>("/chatHub");
 
 
 app.MapControllers();

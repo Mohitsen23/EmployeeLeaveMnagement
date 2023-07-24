@@ -44,12 +44,10 @@ namespace Practice.Controllers
 
             Leaveapp.LeaveStatuses.Add(applyleave);
             Leaveapp.SaveChanges();
-            await _hubContext.Clients.All.SendAsync("ReceiveNotification", "New leave request received");
+            await _hubContext.Clients.All.SendAsync("messageReceived", $"New leave request received from Emplid{applyleave.Emplid}");
+            Console.WriteLine("Message broadcasted!");
             return Ok("Leave Apply Successfully");
         }
-
-
-
-       
+   
     }
 }

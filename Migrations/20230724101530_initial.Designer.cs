@@ -12,8 +12,8 @@ using Practice.Models;
 namespace Practice.Migrations
 {
     [DbContext(typeof(LeaveApplicationContext))]
-    [Migration("20230720073149_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230724101530_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -268,6 +268,38 @@ namespace Practice.Migrations
                     b.ToTable("Manager", (string)null);
                 });
 
+            modelBuilder.Entity("Practice.Models.Messages", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
+                });
+
             modelBuilder.Entity("Practice.Models.Profile", b =>
                 {
                     b.Property<int>("id")
@@ -289,6 +321,58 @@ namespace Practice.Migrations
                     b.HasKey("id");
 
                     b.ToTable("EmployeeProfile", (string)null);
+                });
+
+            modelBuilder.Entity("Practice.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Practice.Models.Employee", b =>
@@ -323,6 +407,25 @@ namespace Practice.Migrations
                     b.Navigation("Leave");
                 });
 
+            modelBuilder.Entity("Practice.Models.Messages", b =>
+                {
+                    b.HasOne("Practice.Models.User", "Receiver")
+                        .WithMany("ReceivedMessages")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Practice.Models.User", "Sender")
+                        .WithMany("SentMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("Practice.Models.Employee", b =>
                 {
                     b.Navigation("LeaveQuota");
@@ -331,6 +434,13 @@ namespace Practice.Migrations
             modelBuilder.Entity("Practice.Models.Manager", b =>
                 {
                     b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("Practice.Models.User", b =>
+                {
+                    b.Navigation("ReceivedMessages");
+
+                    b.Navigation("SentMessages");
                 });
 #pragma warning restore 612, 618
         }

@@ -37,9 +37,12 @@ namespace Practice
                             .AllowCredentials();
                     });
             });
+           
+
+            services.AddSignalR();
             services.AddSingleton<OTP>();
             services.AddTransient<EmailSenderController>();
-            services.AddSignalR();
+          
             services.AddControllers();
             var key = Encoding.ASCII.GetBytes(GenerateSecretKey(32));
             services.AddAuthentication(options =>
@@ -66,17 +69,11 @@ namespace Practice
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("AllowAnyOriginWithCredentials"); // Apply the CORS policy
-
+           
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                // Map SignalR Hub endpoint and apply CORS policy
-                endpoints.MapHub<NotificationHub>("/notificationHub")
-                         .RequireCors("AllowAnyOriginWithCredentials");
-            });
 
             // Rest of your configuration
         }

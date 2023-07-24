@@ -7,9 +7,9 @@ namespace Practice.Nofication
 {
     public class NotificationHub:Hub
     {
-        public async Task SendNotification(string user,string message)
+        public async Task NewMessage( string message)
         {
-            await Clients.All.SendAsync("ReceiveNotification", message);
+            await Clients.All.SendAsync("messageReceived",message);
         }
     }
 }

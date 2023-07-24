@@ -7,6 +7,8 @@ using System.Net.Mail;
 using System.Linq;
 using System.Net;
 using static System.Net.WebRequestMethods;
+using Microsoft.AspNetCore.SignalR;
+using Practice.Nofication;
 
 namespace Practice.Controllers
 {
@@ -15,11 +17,13 @@ namespace Practice.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
+        private readonly IHubContext<NotificationHub> _hubContext;
         private static Random random = new Random();
         private readonly LeaveApplicationContext Leaveapp;
-        public EmployeeController(LeaveApplicationContext leaveapp)
+        public EmployeeController(LeaveApplicationContext leaveapp, IHubContext<NotificationHub> hubContext)
         {
             Leaveapp = leaveapp;
+            _hubContext = hubContext;
         }
         [HttpPost("/empsignup")]
         public async Task<ActionResult> Employee(EmployeeDto mgr)
