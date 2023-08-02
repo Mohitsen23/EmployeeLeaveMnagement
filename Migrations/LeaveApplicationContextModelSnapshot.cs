@@ -265,36 +265,40 @@ namespace Practice.Migrations
                     b.ToTable("Manager", (string)null);
                 });
 
-            modelBuilder.Entity("Practice.Models.Messages", b =>
+            modelBuilder.Entity("Practice.Models.MessageModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<string>("ReceiverId")
+                    b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Message");
 
-                    b.Property<string>("SenderId")
+                    b.Property<string>("ReadorNot")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ReadorNot");
 
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("receiverid")
+                        .HasColumnType("int")
+                        .HasColumnName("receiverid");
 
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("senderid")
+                        .HasColumnType("int")
+                        .HasColumnName("senderid");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime>("timestamp")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("timestamp");
 
-                    b.HasIndex("ReceiverId");
+                    b.HasKey("id");
 
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Message");
+                    b.ToTable("Message", (string)null);
                 });
 
             modelBuilder.Entity("Practice.Models.Profile", b =>
@@ -320,56 +324,27 @@ namespace Practice.Migrations
                     b.ToTable("EmployeeProfile", (string)null);
                 });
 
-            modelBuilder.Entity("Practice.Models.User", b =>
+            modelBuilder.Entity("Practice.Models.UserIdentity", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ConnectionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ConnectionId");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("Userid");
 
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                    b.HasKey("id");
 
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
+                    b.ToTable("Connections", (string)null);
                 });
 
             modelBuilder.Entity("Practice.Models.Employee", b =>
@@ -404,25 +379,6 @@ namespace Practice.Migrations
                     b.Navigation("Leave");
                 });
 
-            modelBuilder.Entity("Practice.Models.Messages", b =>
-                {
-                    b.HasOne("Practice.Models.User", "Receiver")
-                        .WithMany("ReceivedMessages")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Practice.Models.User", "Sender")
-                        .WithMany("SentMessages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("Practice.Models.Employee", b =>
                 {
                     b.Navigation("LeaveQuota");
@@ -431,13 +387,6 @@ namespace Practice.Migrations
             modelBuilder.Entity("Practice.Models.Manager", b =>
                 {
                     b.Navigation("Employees");
-                });
-
-            modelBuilder.Entity("Practice.Models.User", b =>
-                {
-                    b.Navigation("ReceivedMessages");
-
-                    b.Navigation("SentMessages");
                 });
 #pragma warning restore 612, 618
         }

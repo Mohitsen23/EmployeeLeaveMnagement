@@ -29,7 +29,8 @@ public partial class LeaveApplicationContext : DbContext
     public virtual DbSet<Document> Documents { get; set; }
 
     public virtual DbSet<Profile> Profiles { get; set; }
-  
+    public virtual DbSet<MessageModel> MessagesModels { get; set; }
+    public virtual DbSet<UserIdentity> Connections { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=DESKTOP-JJG787Q\\MSSQLSERVER01;Database=LeaveApplication;Integrated Security=True;TrustServerCertificate=true");
@@ -140,11 +141,30 @@ public partial class LeaveApplicationContext : DbContext
                 .HasColumnName("id");
         });
 
+        modelBuilder.Entity<MessageModel>(entity =>
+        {
+            entity.ToTable("Message");
+
+            entity.Property(e => e.senderid)
+                .HasColumnName("senderid");
+              
+
+            entity.Property(e => e.receiverid)
+                .HasColumnName("receiverid");
+            entity.Property(e => e.Message)
+               .HasColumnName("Message");
+
+            entity.Property(e => e.ReadorNot)
+               .HasColumnName("ReadorNot");
 
 
+            entity.Property(e => e.timestamp)
+               .HasColumnName("timestamp");
 
-
-      
+            entity.Property(e => e.id)
+                .HasColumnName("id")
+                  .ValueGeneratedOnAdd();
+        });
 
 
         modelBuilder.Entity<Document>(entity =>
@@ -179,6 +199,27 @@ public partial class LeaveApplicationContext : DbContext
             entity.Property(e => e.id)
                 .HasColumnName("id");
         });
+
+        modelBuilder.Entity<UserIdentity>(entity =>
+        {
+            entity.ToTable("Connections");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("Userid");
+
+
+            entity.Property(e => e.ConnectionId)
+                .HasColumnName("ConnectionId");
+
+
+            entity.Property(e => e.id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+        });
+
+
+
+
 
 
 

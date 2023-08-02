@@ -10,12 +10,12 @@ namespace Practice.Models
         public string Text { get; set; }
         public DateTime SentAt { get; set; }
 
-        // Foreign key to associate the message with the sender (User).
+      
         public string SenderId { get; set; }
-        public virtual User Sender { get; set; }
+       
 
-        // Foreign key to associate the message with the receiver (User).
+     
         public string ReceiverId { get; set; }
-        public virtual User Receiver { get; set; }
+     
     }
 }

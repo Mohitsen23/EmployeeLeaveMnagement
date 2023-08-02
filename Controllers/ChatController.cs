@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Practice.ChatHub;
+using Microsoft.EntityFrameworkCore;
 using Practice.Models;
+
 
 namespace Practice.Controllers
 {
-    public class ChatController:ControllerBase
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ChatController : ControllerBase
     {
-        private readonly IHubContext<ChatdataHub> _hubContext;
-        public ChatController(IHubContext<ChatdataHub> _context)
+      
+        private readonly LeaveApplicationContext leaveapp; 
+        public ChatController(LeaveApplicationContext _leaveapp)
         {
-            _hubContext = _context;
+           
+            leaveapp = _leaveapp;
         }
-        [HttpPost("/SendMessage")]
-        public async Task<IActionResult> sendMessage([FromBody] Messages message)
-        {
-                 return Ok();
 
-
-        }
+       
     }
 }

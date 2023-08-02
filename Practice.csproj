@@ -118,7 +118,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <Folder Include="ChatHub\" />
   </ItemGroup>
 
 </Project>

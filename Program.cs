@@ -5,11 +5,11 @@ using Microsoft.IdentityModel.Tokens;
 using Practice.Models;
 using System.Text;
 using Practice.Nofication;
-using Practice.ChatHub;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddDbContext<LeaveApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PracticeApp")));
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 
 
-// Enable CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -41,13 +41,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -58,10 +58,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 
-app.UseCors(); // Add this line to enable CORS
+app.UseCors(); 
+
 app.MapHub<NotificationHub>("/notificationHub");
 
-app.MapHub<ChatdataHub>("/chatHub");
+
 
 
 app.MapControllers();

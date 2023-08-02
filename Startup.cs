@@ -1,15 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+
 using Microsoft.IdentityModel.Tokens;
 using Practice.Controllers;
 using Practice.Models;
-using Practice.Nofication;
+
 using System.Security.Cryptography;
 using System.Text;
 
@@ -37,9 +31,13 @@ namespace Practice
                             .AllowCredentials();
                     });
             });
-           
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConsole(); 
+            });
 
-            services.AddSignalR();
+
+
             services.AddSingleton<OTP>();
             services.AddTransient<EmailSenderController>();
           

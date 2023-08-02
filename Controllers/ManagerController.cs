@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Practice.Models;
 using Practice.NewFolder;
-using System.ComponentModel;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+
 
 
 namespace Practice.Controllers
@@ -36,12 +34,8 @@ namespace Practice.Controllers
             var User = Leaveapp.Managers.FirstOrDefault(user => user.Email == mgr.Email);
             if (User != null)
             {
-
-
-
-                return BadRequest("User With Email Already Exist");
-
-            }
+              return BadRequest("User With Email Already Exist");
+             }
 
             var manager = new Manager
             {
@@ -60,28 +54,38 @@ namespace Practice.Controllers
 
         }
 
+        private int? GetUserIdFromClaims()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return userId;
+            }
+
+            return null;
+        }
 
         [HttpPost("/mgrlogin")]
         public async Task<ActionResult<Manager>> ManagerLogin(MgrLoginDTO mgr)
         {
             var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
-
+           
             if (user != null && user.Password == mgr.Password)
             {
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, mgr.Email),
             new Claim(ClaimTypes.Role, "Manager"),
-            // Add any additional claims as needed
-        };
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 
+        };
                 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var token = new JwtSecurityToken(
                     issuer: _config["Jwt:Issuer"],
                     audience: _config["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddHours(1), // Use local time zone for expiration
+                    expires: DateTime.Now.AddHours(1),
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                 );
 
@@ -97,27 +101,15 @@ namespace Practice.Controllers
         [Authorize(Roles = "Manager")]
         [HttpPost("/mgrlogindata")]
         public async Task<ActionResult<Manager>> ManagerLoginData(MgrLoginDTO mgr)
-        {
-            var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
+        {   var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
 
             if (user != null && user.Password == mgr.Password)
-            {
-               
-                return Ok(user);
+            { return Ok(user);
             }
 
             return BadRequest("User does not exist");
         }
-
-
-
-
-
-
-
-
-
-
+         
         [HttpGet("/EmployeesbyMgrId/{id}")]
         public async Task<ActionResult<Employee>> EmployeesbyMgrId(int id)
         {
@@ -134,18 +126,12 @@ namespace Practice.Controllers
 
        
         public async Task<ActionResult<List<LeaveStatus>>> AllLeaveRequest()
-        {
-            // Assuming you have a database context named "dbContext" with a DbSet for LeaveTable
-            List<LeaveStatus> leaveRequests = await Leaveapp.LeaveStatuses.ToListAsync();
-
+        {   List<LeaveStatus> leaveRequests = await Leaveapp.LeaveStatuses.ToListAsync();
+            var userid = GetUserIdFromClaims();
             List<LeaveStatus> FilteredRequest = new List<LeaveStatus>();
             foreach(var data in leaveRequests)
-            {
-               
-            
-                    FilteredRequest.Add(data);
-               
-            }
+            { FilteredRequest.Add(data);
+             }
 
             return FilteredRequest;
         }
@@ -168,6 +154,23 @@ namespace Practice.Controllers
             return BadRequest("Not Approved");
         }
 
+
+
+
+        [HttpGet("/getManagers")]
+        public async Task<ActionResult<List<Manager>>> getManager()
+        {
+           
+           
+            List<Manager> ManagerList = await Leaveapp.Managers.ToListAsync();
+            if(ManagerList != null)
+            {
+                return ManagerList;
+            }
+            
+            return BadRequest("No Managers");
+
+        }
 
 
 
