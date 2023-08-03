@@ -53,11 +53,10 @@ namespace Practice.Nofication
         private List<UserIdentity> userIdentity;
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var identity = GetIdentityFromContext();
-            string userId = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            userIdentity = _leaveApplicationContext.Connections
-          .Where(user => user.UserId == int.Parse(userId))
+             var identity = GetIdentityFromContext();
+             string userId = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+             userIdentity = _leaveApplicationContext.Connections
+            .Where(user => user.UserId == int.Parse(userId))
             .ToList();
             if (userIdentity != null)
             {
@@ -99,9 +98,16 @@ namespace Practice.Nofication
             }
             else if (message.ToLower().Contains("how are you"))
             {
-                return "I'm just a chatbot, but I'm doing well. How can I assist you?";
+                return "I'm just a chatbot, How can I assist you?  ";
             }
-
+            else if (message.ToLower().Contains("my email"))
+            {
+                return "details";
+            }
+            else if (message.ToLower().Contains("my employees"))
+            {
+                return "employee";
+            }
             else
             {
                 return "I'm sorry, I don't understand. Can you rephrase your message?";
