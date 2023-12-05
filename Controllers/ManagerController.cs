@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Practice.Controllers;
 using Practice.Models;
 using Practice.NewFolder;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,104 +10,91 @@ using System.Security.Claims;
 using System.Text;
 
 
-
 namespace Practice.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ManagerController : ControllerBase
-    {
+        {
         private readonly LeaveApplicationContext Leaveapp;
         private readonly IConfiguration _config;
         public ManagerController(LeaveApplicationContext leaveapp, IConfiguration config)
-        {
+         {
             Leaveapp = leaveapp;
             _config = config;
-
-        }
+         }
         [HttpPost]
-        public async Task<ActionResult> manager([FromBody] ManagerDTO mgr)
+        public async  Task<ActionResult> manager([FromBody] ManagerDTO mgr)
         {
             if (mgr == null)
-            {
-                return BadRequest("please Insert the Data");
+            { return BadRequest("please Insert the Data");
             }
             var User = Leaveapp.Managers.FirstOrDefault(user => user.Email == mgr.Email);
             if (User != null)
-            {
+             {
               return BadRequest("User With Email Already Exist");
              }
-
-            var manager = new Manager
-            {
+              var manager = new Manager
+              {
                 Firstname = mgr.Firstname,
                 Lastname = mgr.Lastname,
                 Email = mgr.Email,
                 Password = mgr.Password,
                 Department = mgr.Department,
                 Companyname = mgr.Companyname,
-              
-            };
-            Leaveapp.Managers.Add(manager);
-            Leaveapp.SaveChanges();
-
-            return Ok(manager);
-
-        }
+              };
+              Leaveapp.Managers.Add(manager);
+              Leaveapp.SaveChanges();
+              return Ok(manager);
+              }
 
         private int? GetUserIdFromClaims()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
-            {
+             if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+             {
                 return userId;
-            }
-
-            return null;
+             }
+               return null;
         }
+
 
         [HttpPost("/mgrlogin")]
         public async Task<ActionResult<Manager>> ManagerLogin(MgrLoginDTO mgr)
-        {
-            var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
-           
-            if (user != null && user.Password == mgr.Password)
-            {
+         {   var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
+             if (user != null && user.Password == mgr.Password)
+
+             {
                 var claims = new List<Claim>
-        {
+             {  
+
             new Claim(ClaimTypes.Name, mgr.Email),
             new Claim(ClaimTypes.Role, "Manager"),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 
-        };
-                var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-                var token = new JwtSecurityToken(
-                    issuer: _config["Jwt:Issuer"],
-                    audience: _config["Jwt:Audience"],
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(1),
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+            };
+              var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+              var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+              audience: _config["Jwt:Audience"],
+                claims: claims,
+               expires: DateTime.Now.AddHours(1),
+               signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                 );
 
-                var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+               var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
                 return Ok(jwtToken);
-            }
-
-            return BadRequest("User does not exist");
+             } return BadRequest("User does not exist");
         }
-
 
 
         [Authorize(Roles = "Manager")]
         [HttpPost("/mgrlogindata")]
         public async Task<ActionResult<Manager>> ManagerLoginData(MgrLoginDTO mgr)
         {   var user = Leaveapp.Managers.SingleOrDefault(u => u.Email == mgr.Email);
-
-            if (user != null && user.Password == mgr.Password)
+              if (user != null && user.Password == mgr.Password)
             { return Ok(user);
             }
-
             return BadRequest("User does not exist");
         }
          
@@ -121,30 +109,24 @@ namespace Practice.Controllers
             return BadRequest("No Employees Under Manager");
         }
 
-        [Authorize(Roles = "Manager")]
+        
         [HttpGet("/leaveRequest")]
-
-       
-        public async Task<ActionResult<List<LeaveStatus>>> AllLeaveRequest()
+         public async Task<ActionResult<List<LeaveStatus>>> AllLeaveRequest()
         {   List<LeaveStatus> leaveRequests = await Leaveapp.LeaveStatuses.ToListAsync();
             var userid = GetUserIdFromClaims();
             List<LeaveStatus> FilteredRequest = new List<LeaveStatus>();
             foreach(var data in leaveRequests)
             { FilteredRequest.Add(data);
              }
-
-            return FilteredRequest;
+          return FilteredRequest;
         }
 
 
-        [Authorize(Roles = "Manager")]
+       
         [HttpGet("/RejectLeaveRequest/{leaveid}")]
         public async Task<IActionResult> RejectLeaveRequest(int leaveid)
-        {
-
-            var LeaveData = await Leaveapp.LeaveStatuses.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
-
-            if (LeaveData != null)
+        { var LeaveData = await Leaveapp.LeaveStatuses.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
+             if (LeaveData != null)
             {
                 LeaveData.Status = "Rejected";
                
@@ -159,10 +141,7 @@ namespace Practice.Controllers
 
         [HttpGet("/getManagers")]
         public async Task<ActionResult<List<Manager>>> getManager()
-        {
-           
-           
-            List<Manager> ManagerList = await Leaveapp.Managers.ToListAsync();
+        { List<Manager> ManagerList = await Leaveapp.Managers.ToListAsync();
             if(ManagerList != null)
             {
                 return ManagerList;
@@ -177,9 +156,7 @@ namespace Practice.Controllers
         [Authorize(Roles = "Manager")]
         [HttpGet("/ChangeLeaveStatus/{leaveid}")]
         public async Task<IActionResult> UpdateLeaveRequest(int leaveid)
-        {
-
-        var LeaveData = await Leaveapp.LeaveStatuses.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
+        {  var LeaveData = await Leaveapp.LeaveStatuses.FirstOrDefaultAsync(leave => leave.Leaveid == leaveid);
 
             if (LeaveData != null)
             {
@@ -233,14 +210,9 @@ namespace Practice.Controllers
             return BadRequest("Employee not found");
         }
 
-
-
-
-
     }
 
-
-
+    
 
 }
 

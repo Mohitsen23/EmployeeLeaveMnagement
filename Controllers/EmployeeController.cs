@@ -1,12 +1,9 @@
-﻿   using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Practice.Models;
 using Practice.NewFolder;
-using System.Net.Mail;
-
-using System.Linq;
+using System.Net.Mail;using System.Linq;
 using System.Net;
-using static System.Net.WebRequestMethods;
 using Microsoft.AspNetCore.SignalR;
 using Practice.Nofication;
 
@@ -16,34 +13,29 @@ namespace Practice.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
-    {
-        private readonly IHubContext<NotificationHub> _hubContext;
+    {   private readonly IHubContext<NotificationHub> _hubContext;
         private static Random random = new Random();
         private readonly LeaveApplicationContext Leaveapp;
-        public EmployeeController(LeaveApplicationContext leaveapp, IHubContext<NotificationHub> hubContext)
+       public EmployeeController(LeaveApplicationContext leaveapp, IHubContext<NotificationHub> hubContext)
         {
-            Leaveapp = leaveapp;
+             Leaveapp = leaveapp;
             _hubContext = hubContext;
         }
+       
         [HttpPost("/empsignup")]
         public async Task<ActionResult> Employee(EmployeeDto mgr)
         {
-
-
-            var User = Leaveapp.Employees.Where(user => user.Email == mgr.Email).SingleOrDefault();
+           var User = Leaveapp.Employees.Where(user => user.Email == mgr.Email).SingleOrDefault();
             if (User != null)
             {
                 return BadRequest("User With Email Already Exist");
 
             }
-
             Guid guid = Guid.NewGuid();
             byte[] bytes = guid.ToByteArray();
             int uniqueInteger = BitConverter.ToInt32(bytes, 0);
-
             var employee = new Employee
-            {
-
+             {  
                 Firstname = mgr.Firstname,
                 Lastname = mgr.Lastname,
                 Email = mgr.Email,
@@ -76,14 +68,7 @@ namespace Practice.Controllers
 
             return BadRequest("User Does Not Exist");
         }
-
-
-
-
-
-
-
-        static string GenerateOTP(int length)
+         static string GenerateOTP(int length)
         {
             const string digits = "0123456789";
             Random random = new Random();
@@ -98,23 +83,12 @@ namespace Practice.Controllers
         }
 
 
-
-
-
-
-
-
-
-
-
         [HttpPost("/generateOTP/{email}")]
         public ActionResult generateOTP(String email)
         {
             var eml = email + "          ";
             var user = Leaveapp.Employees.FirstOrDefault((emp) => emp.Email == eml);
-
-
-           if(user != null) {
+             if(user != null) {
                 string senderEmail = "mohitsen623@gmail.com";
                 string senderPassword = "bhkwcboukeatroij";
                 int otpLength = 4;
@@ -123,10 +97,7 @@ namespace Practice.Controllers
                 {
                     MailMessage mail = new MailMessage(senderEmail, email);
                     mail.Subject = "OTP for Login";
-
                     mail.Body = otp;
-
-                    // Construct the HTML body with the provided content
                     string htmlBody = $@"
                     <html>
                     <head>
@@ -184,17 +155,16 @@ namespace Practice.Controllers
                     </body>
                     </html>";
 
-                    // Set the HTML body
+                   
                     mail.Body = htmlBody;
                     mail.IsBodyHtml = true;
 
-                    // Create a new SmtpClient and specify the SMTP server settings
                     SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
                     smtpClient.EnableSsl = true;
                     smtpClient.UseDefaultCredentials = false;
                     smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
 
-                    // Send the email
+                    
                     smtpClient.Send(mail);
 
                     return Ok(otp);
@@ -207,14 +177,7 @@ namespace Practice.Controllers
 
             }
             return BadRequest();
-
-
-
-        }
-
-
-
-
+ }
 
         [HttpGet("/getUserByID/{id}")]
         public async Task<ActionResult<Employee>> getUserById(int id)
@@ -278,19 +241,14 @@ namespace Practice.Controllers
             }
             return BadRequest("Getting Error");
         }
-
-
         [HttpDelete("/deleteLeave/{id}")]
-        public async Task<ActionResult> deleteLeave(int id)
+         public async Task<ActionResult> deleteLeave(int id)
         {
             var employee = Leaveapp.LeaveStatuses.FirstOrDefault(emp => emp.Id == id);
             if (employee != null)
-            {
-
-                Leaveapp.LeaveStatuses.Remove(employee);
+            { Leaveapp.LeaveStatuses.Remove(employee);
                 Leaveapp.SaveChanges();
                 return Ok("Removed Successfully");
-
             }
             return BadRequest("Not Deleted");
 

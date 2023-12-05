@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 public class NotificationController : ControllerBase
 {
     private readonly IHubContext<NotificationHub> _hubContext;
-
-    public NotificationController(IHubContext<NotificationHub> hubContext)
+    private readonly LeaveApplicationContext leave_App;
+    public NotificationController(IHubContext<NotificationHub> hubContext, LeaveApplicationContext leave__App)
     {
         _hubContext = hubContext;
+        leave_App = leave__App;
+
     }
 
     [HttpPost("/notification")]
@@ -20,6 +22,6 @@ public class NotificationController : ControllerBase
     { await _hubContext.Clients.All.SendAsync("ReceiveNotification", notification.message);
           return Ok();
     }
-
+   
 
 }

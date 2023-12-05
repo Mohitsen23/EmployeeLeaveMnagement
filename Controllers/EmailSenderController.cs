@@ -18,21 +18,14 @@ namespace Practice.Controllers
         [HttpPost("/sendEmail")]
         public IActionResult SendEmail([FromBody] EmailData email)
         {
-            // Sender details
             string senderEmail = "mohitsen623@gmail.com";
             string senderPassword = "bhkwcboukeatroij";
 
             try
             {
-                // Create a new MailMessage object
-
-
-
                 MailMessage mail = new MailMessage(senderEmail, email.recipientEmail);
                 mail.Subject = email.subject;
-
-                // Construct the HTML body with the provided content
-                string htmlBody = $@"
+                   string htmlBody = $@"
                     <html>
                     <head>
                         <style>
@@ -56,54 +49,40 @@ namespace Practice.Controllers
                                 /* Add your custom styles here */
                                  background-color: #fff;
                                  padding:10px;
-                               
-                            }}
+                                 }}
                          .heading {{
                             text-align:center;
                             color:blue;
-                            
-                          }}
-                          
-                        </style>
+                           }}
+                       </style>
                     </head>
                     <body>
                     <div class=""body"">
                     <img class=""img""custom-image"" src=""https://www.passionateinmarketing.com/wp-content/uploads/2021/09/Online-Upskilling-Platform-Scaler-Academy-launches-Forever-1068x601.jpg
                     "" alt=""Image"" />
-
                     <div class=""custom-div"">
-                     
-
-                       <p>
-
-
-
-                    Hey! <br>
+                     <p>
+                     Hey! <br>
                     To help you in your career journey, we have lined up exclusive free events for you in the coming week: <br>
                     1. Monolithic and Microservices architecture <br>
                     Register to Learn the best practices for selecting the right architecture.<br>
                     Date: July 20th, Thursday, at 8 PM</P> <br>
-
-     
-                     
-
-
                     </div>
-</div>
+                   </div>
                     </body>
                     </html>";
 
-                // Set the HTML body
+            
                 mail.Body = htmlBody;
                 mail.IsBodyHtml = true;
 
-                // Create a new SmtpClient and specify the SMTP server settings
+             
                 SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
                 smtpClient.EnableSsl = true;
                 smtpClient.UseDefaultCredentials = false;
                 smtpClient.Credentials = new NetworkCredential(senderEmail, senderPassword);
 
-                // Send the email
+               
                 smtpClient.Send(mail);
 
                 return Ok("Email sent successfully!");

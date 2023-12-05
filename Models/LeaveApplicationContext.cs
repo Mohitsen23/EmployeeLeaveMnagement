@@ -1,22 +1,13 @@
-﻿
-using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 namespace Practice.Models;
-
 public partial class LeaveApplicationContext : DbContext
 {
-    public LeaveApplicationContext()
-    {
-    }
-
     public LeaveApplicationContext(DbContextOptions<LeaveApplicationContext> options)
         : base(options)
     {
-    }
 
-    public virtual DbSet<Employee> Employees { get; set; }
+    }
+  public virtual DbSet<Employee> Employees { get; set; }
 
     public virtual DbSet<LeaveQuotum> LeaveQuota { get; set; }
 
@@ -31,8 +22,9 @@ public partial class LeaveApplicationContext : DbContext
     public virtual DbSet<Profile> Profiles { get; set; }
     public virtual DbSet<MessageModel> MessagesModels { get; set; }
     public virtual DbSet<UserIdentity> Connections { get; set; }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+
         => optionsBuilder.UseSqlServer("Server=DESKTOP-JJG787Q\\MSSQLSERVER01;Database=LeaveApplication;Integrated Security=True;TrustServerCertificate=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -67,9 +59,11 @@ public partial class LeaveApplicationContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("password");
 
-            entity.HasOne(d => d.ManagerNavigation).WithMany(p => p.Employees)
+            entity.HasOne(d => d.ManagerNavigation)
+                .WithMany(p => p.Employees)
                 .HasForeignKey(d => d.Manager)
                 .HasConstraintName("FK_Employee_Manager");
+
         });
 
         modelBuilder.Entity<LeaveQuotum>(entity =>
@@ -123,11 +117,8 @@ public partial class LeaveApplicationContext : DbContext
                 .HasConstraintName("FK_LeaveStatus_LeaveTable");
         });
 
-
-
-
-        modelBuilder.Entity<LeaveTable>(entity =>
-        {
+            modelBuilder.Entity<LeaveTable>(entity =>
+          {
             entity.ToTable("LeaveTable");
 
             entity.Property(e => e.Leaveid)
@@ -165,7 +156,6 @@ public partial class LeaveApplicationContext : DbContext
                 .HasColumnName("id")
                   .ValueGeneratedOnAdd();
         });
-
 
         modelBuilder.Entity<Document>(entity =>
         {
@@ -217,14 +207,7 @@ public partial class LeaveApplicationContext : DbContext
                 .ValueGeneratedOnAdd();
         });
 
-
-
-
-
-
-
-
-        modelBuilder.Entity<Manager>(entity =>
+         modelBuilder.Entity<Manager>(entity =>
         {
             entity.ToTable("Manager");
 

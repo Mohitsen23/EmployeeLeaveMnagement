@@ -98,6 +98,9 @@ namespace Practice.Migrations
                         .HasColumnName("password")
                         .IsFixedLength();
 
+                    b.Property<int>("ProfileRating")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 

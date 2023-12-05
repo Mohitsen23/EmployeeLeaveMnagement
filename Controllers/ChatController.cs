@@ -7,6 +7,7 @@ namespace Practice.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class ChatController : ControllerBase
     {
       
@@ -17,6 +18,30 @@ namespace Practice.Controllers
             leaveapp = _leaveapp;
         }
 
-       
+        [HttpPost("/SendMessage")]
+        public IActionResult sendMessageData( MessageModel msgdata)
+        {
+            try
+            {
+                    var message = new MessageModel
+                {
+                    senderid = msgdata.senderid,
+                    receiverid = msgdata.receiverid,
+                    ReadorNot = msgdata.ReadorNot,
+                    Message = msgdata.Message,
+                    timestamp = msgdata.timestamp,
+                };
+                leaveapp.MessagesModels.Add(message);
+                leaveapp.SaveChanges();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest();
+            }
+        }
+
+
     }
 }
